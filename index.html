@@ -1,0 +1,888 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ba định luật Newton - Vật lí 10</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #071426;
+  --panel: #10253d;
+  --cyan: #59e4ff;
+  --pink: #ff83bd;
+  --gold: #ffc16c;
+  --muted: #c0d0e4;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(ellipse at 75% 15%, #17395a, transparent 40%),
+    var(--bg);
+  color: #f5f8ff;
+  font-family: "Be Vietnam Pro", Arial, sans-serif;
+  overflow: hidden;
+}
+
+.stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, #fff9 45%, transparent 60%),
+    radial-gradient(1px 1px at 70% 20%, #fff8 45%, transparent 60%),
+    radial-gradient(2px 2px at 85% 75%, #fff7 45%, transparent 60%);
+  background-size: 300px 260px;
+  animation: tw 8s infinite alternate;
+}
+
+@keyframes tw {
+  to { opacity: .35; transform: translateY(-10px); }
+}
+
+header {
+  height: 64px;
+  padding: 0 4vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #ffffff22;
+  position: relative;
+  z-index: 3;
+  background: #071426cc;
+}
+
+header b { letter-spacing: .08em; }
+header span { color: var(--cyan); }
+
+button { font: inherit; cursor: pointer; }
+
+.deck { height: calc(100dvh - 64px); }
+
+.slide {
+  display: none;
+  height: 100%;
+  padding: 5vh 8vw 100px;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 4vw;
+  overflow: auto;
+}
+
+.slide.active {
+  display: grid;
+  animation: appear .65s both;
+}
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: none; }
+}
+
+.slide.center {
+  grid-template-columns: 1fr;
+  text-align: center;
+  justify-items: center;
+}
+
+.tag {
+  color: var(--cyan);
+  font-weight: 800;
+  letter-spacing: .17em;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.slide h1 {
+  font-size: clamp(42px, 7vw, 92px);
+  line-height: 1.04;
+  margin: 0 0 22px;
+  font-weight: 900;
+}
+
+.slide h2 {
+  font-size: clamp(34px, 4.5vw, 60px);
+  line-height: 1.1;
+  margin: 0 0 20px;
+  font-weight: 900;
+}
+
+.cyan { color: var(--cyan); }
+.pink { color: var(--pink); }
+.gold { color: var(--gold); }
+
+p {
+  color: var(--muted);
+  font-size: clamp(17px, 1.55vw, 22px);
+  line-height: 1.7;
+}
+
+.big {
+  font-size: clamp(48px, 7vw, 82px);
+  font-weight: 900;
+  color: var(--cyan);
+  margin: 15px 0;
+}
+
+.panel {
+  background: linear-gradient(145deg, #19324f, #0e1f34);
+  border: 1px solid #ffffff25;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 22px 60px #0005;
+}
+
+.panel h3 { margin-top: 0; font-size: 22px; }
+
+.visual {
+  display: grid;
+  place-items: center;
+  position: relative;
+  min-height: 300px;
+}
+
+.planet {
+  width: min(27vw, 290px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 25%, #b3f7ff, #3689c4 32%, #102b50 72%);
+  box-shadow: 0 0 75px #45dfff66;
+  animation: float 5s ease-in-out infinite;
+}
+
+.orbit {
+  position: absolute;
+  width: min(40vw, 430px);
+  height: 150px;
+  border: 1px solid #59e4ff88;
+  border-radius: 50%;
+  transform: rotate(-20deg);
+  animation: orbit 15s linear infinite;
+}
+
+@keyframes float {
+  50% { transform: translateY(-15px); }
+}
+
+@keyframes orbit {
+  to { transform: rotate(340deg); }
+}
+
+img {
+  width: 100%;
+  max-height: 430px;
+  object-fit: cover;
+  border-radius: 20px;
+  border: 1px solid #ffffff33;
+}
+
+.caption {
+  font-size: 12px;
+  color: #9fb4ce;
+}
+
+.formula {
+  font-size: clamp(38px, 6vw, 74px);
+  font-weight: 900;
+  color: var(--cyan);
+  margin: 15px 0;
+}
+
+.chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  padding: 11px 14px;
+  background: #ffffff0d;
+  border: 1px solid #ffffff24;
+  border-radius: 13px;
+  font-weight: 700;
+}
+
+.simstage {
+  height: 210px;
+  background: linear-gradient(#0c2945, #172b40);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #ffffff22;
+}
+
+.ground {
+  position: absolute;
+  bottom: 28px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #90a9c6;
+}
+
+.block {
+  position: absolute;
+  bottom: 31px;
+  left: 35px;
+  width: 65px;
+  height: 55px;
+  border-radius: 10px;
+  background: linear-gradient(130deg, #77edff, #4377d4);
+  box-shadow: 0 0 30px #51dfff77;
+  transition: left .45s, width .25s;
+}
+
+.arrow {
+  position: absolute;
+  bottom: 105px;
+  left: 110px;
+  color: var(--gold);
+  font-size: 30px;
+  font-weight: 900;
+  transition: transform .3s;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 15px 0;
+}
+
+.controls label {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.controls input {
+  accent-color: var(--cyan);
+  width: 150px;
+}
+
+.value {
+  color: var(--cyan);
+  font-weight: 900;
+}
+
+.action, .ghost {
+  border: 0;
+  border-radius: 12px;
+  padding: 12px 17px;
+  font-weight: 800;
+}
+
+.action {
+  background: var(--cyan);
+  color: #071426;
+}
+
+.ghost {
+  background: #ffffff10;
+  border: 1px solid #ffffff3b;
+  color: white;
+}
+
+.nav {
+  position: fixed;
+  bottom: 18px;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 5;
+}
+
+.nav button {
+  background: #142b45;
+  color: white;
+  border: 1px solid #ffffff35;
+  border-radius: 30px;
+  padding: 11px 17px;
+  font-weight: 800;
+}
+
+.nav .next {
+  background: var(--cyan);
+  color: #071426;
+  border: 0;
+}
+
+.counter {
+  min-width: 60px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.dots {
+  display: flex;
+  gap: 5px;
+}
+
+.dots button {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 0;
+}
+
+.dots button.on {
+  background: var(--cyan);
+  width: 20px;
+}
+
+.quiz {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.quiz button {
+  text-align: left;
+  color: white;
+  background: #ffffff0c;
+  border: 1px solid #ffffff30;
+  border-radius: 12px;
+  padding: 13px;
+}
+
+.feedback {
+  color: #7ef0c2;
+  font-weight: 800;
+  min-height: 30px;
+}
+
+.links a {
+  display: block;
+  color: var(--cyan);
+  margin: 12px 0;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.links a:hover { text-decoration: underline; }
+
+@media(max-width:720px) {
+  header { height: 56px; padding: 0 16px; }
+  .deck { height: calc(100dvh - 56px); }
+  .slide {
+    padding: 24px 20px 90px;
+    grid-template-columns: 1fr;
+    align-content: center;
+    gap: 15px;
+  }
+  .visual { min-height: 170px; order: -1; }
+  .planet { width: 150px; }
+  .orbit { width: 230px; height: 90px; }
+  .slide h1 { font-size: 44px; }
+  .slide h2 { font-size: 35px; }
+  p { font-size: 16px; }
+  .panel { padding: 17px; }
+  .dots { display: none; }
+  .nav { bottom: 10px; }
+  .nav button { padding: 10px 13px; }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+
+<body>
+<div class="stars"></div>
+
+<header>
+  <b>VẬT LÍ <span>10</span> · KHÁM PHÁ CHUYỂN ĐỘNG</b>
+  <button class="ghost" id="full">Toàn màn hình ⛶</button>
+</header>
+
+<main class="deck">
+
+<!-- 1. MỞ ĐẦU -->
+<section class="slide active">
+  <div>
+    <div class="tag">CHUYÊN ĐỀ VẬT LÍ 10</div>
+    <h1>BA ĐỊNH LUẬT <span class="cyan">NEWTON</span></h1>
+    <p>Vì sao vật đứng yên? Vì sao xe tăng tốc? Điều gì đẩy tên lửa bay lên? Cùng khám phá ba quy luật nền tảng giải thích chuyển động quanh ta.</p>
+    <div class="chips">
+      <span class="chip">Lực</span>
+      <span class="chip">Khối lượng</span>
+      <span class="chip">Gia tốc</span>
+      <span class="chip">Tương tác</span>
+    </div>
+  </div>
+  <div class="visual">
+    <div class="planet"></div>
+    <div class="orbit"></div>
+  </div>
+</section>
+
+<!-- 2. NEWTON -->
+<section class="slide">
+  <div>
+    <div class="tag">01 · NHÀ KHOA HỌC</div>
+    <h2>Isaac <span class="cyan">Newton</span></h2>
+    <p>Isaac Newton (1643–1727) là nhà vật lí và toán học người Anh. Năm 1687, ông công bố tác phẩm Principia, trình bày ba định luật chuyển động và định luật vạn vật hấp dẫn.</p>
+    <p>Ba định luật đã đặt nền móng cho cơ học cổ điển, giúp con người mô tả và dự đoán chuyển động.</p>
+    <div class="chips">
+      <span class="chip">1643–1727</span>
+      <span class="chip">Cơ học cổ điển</span>
+    </div>
+  </div>
+  <div>
+    <img src="https://commons.wikimedia.org/wiki/Special:FilePath/GodfreyKneller-IsaacNewton-1689.jpg" alt="Chân dung Isaac Newton">
+    <p class="caption">Chân dung Isaac Newton · Wikimedia Commons</p>
+  </div>
+</section>
+
+<!-- 3. LỰC -->
+<section class="slide">
+  <div>
+    <div class="tag">02 · KIẾN THỨC NỀN</div>
+    <h2>Hiểu đúng về <span class="cyan">lực</span></h2>
+    <p>Lực là tác dụng đẩy hoặc kéo của vật này lên vật khác. Lực có thể làm thay đổi vận tốc hoặc làm vật biến dạng.</p>
+    <div class="big">F · N</div>
+    <p>F là kí hiệu lực; niutơn (N) là đơn vị đo lực. Lực là đại lượng vectơ, có điểm đặt, phương, chiều và độ lớn.</p>
+  </div>
+  <div class="panel">
+    <h3>Hợp lực</h3>
+    <p>Hợp lực là lực thay thế cho tác dụng đồng thời của nhiều lực lên một vật.</p>
+    <p class="cyan">Hợp lực bằng 0:</p>
+    <p>Vật không đổi vận tốc.</p>
+    <p class="gold">Hợp lực khác 0:</p>
+    <p>Vật có gia tốc, tức vận tốc thay đổi.</p>
+  </div>
+</section>
+
+<!-- 4. ĐỊNH LUẬT I -->
+<section class="slide">
+  <div>
+    <div class="tag">03 · ĐỊNH LUẬT I NEWTON</div>
+    <h2>Định luật <span class="cyan">quán tính</span></h2>
+    <p>Nếu một vật không chịu lực tác dụng hoặc chịu các lực có hợp lực bằng không, vật đang đứng yên sẽ tiếp tục đứng yên; vật đang chuyển động sẽ tiếp tục chuyển động thẳng đều.</p>
+    <div class="formula">ΣF = 0</div>
+    <p>Quán tính là tính chất giữ nguyên trạng thái đứng yên hoặc chuyển động của vật.</p>
+  </div>
+  <div class="panel">
+    <h3>Ví dụ: xe phanh đột ngột</h3>
+    <img src="https://images.unsplash.com/photo-1504457047772-27faf1c00561?auto=format&fit=crop&w=1000&q=85" alt="Xe buýt trên đường">
+    <p>Khi xe phanh, cơ thể có xu hướng tiếp tục chuyển động về phía trước. Dây an toàn giúp giữ người lại.</p>
+  </div>
+</section>
+
+<!-- 5. MÔ PHỎNG -->
+<section class="slide">
+  <div>
+    <div class="tag">04 · MÔ PHỎNG ĐỊNH LUẬT I</div>
+    <h2>Vật giữ trạng thái chuyển động</h2>
+    <p>Khi hợp lực bằng không, vật không tự tăng tốc, giảm tốc hay đổi hướng. Hãy bấm nút để quan sát mô hình chuyển động.</p>
+    <div class="controls">
+      <button class="action" id="move">Cho vật chuyển động</button>
+      <button class="ghost" id="reset">Đặt lại</button>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="simstage">
+      <div class="ground"></div>
+      <div class="block" id="inertia"></div>
+      <div class="arrow">→</div>
+    </div>
+    <p>Trong mô hình lí tưởng, khi không có hợp lực, vận tốc được giữ nguyên.</p>
+  </div>
+</section>
+
+<!-- 6. ĐỊNH LUẬT II -->
+<section class="slide">
+  <div>
+    <div class="tag">05 · ĐỊNH LUẬT II NEWTON</div>
+    <h2>Lực tạo ra <span class="cyan">gia tốc</span></h2>
+    <p>Gia tốc cùng hướng với hợp lực. Độ lớn gia tốc tỉ lệ thuận với hợp lực và tỉ lệ nghịch với khối lượng.</p>
+    <div class="formula">F = m × a</div>
+    <p>F: hợp lực (N) · m: khối lượng (kg) · a: gia tốc (m/s²).</p>
+  </div>
+  <div class="panel">
+    <h3>Ví dụ tính toán</h3>
+    <p>Xe đẩy có khối lượng 20 kg chịu hợp lực 40 N.</p>
+    <div class="big">a = 40 / 20</div>
+    <h2 class="cyan">2 m/s²</h2>
+    <p>Gia tốc của xe là 2 mét trên giây bình phương.</p>
+  </div>
+</section>
+
+<!-- 7. THÍ NGHIỆM ĐỊNH LUẬT II -->
+<section class="slide">
+  <div>
+    <div class="tag">06 · THỬ NGHIỆM TƯƠNG TÁC</div>
+    <h2>Thay đổi lực và khối lượng</h2>
+    <p>Kéo các thanh trượt để thấy gia tốc thay đổi ra sao.</p>
+
+    <div class="controls">
+      <label>Hợp lực</label>
+      <input id="force" type="range" min="10" max="100" step="10" value="40">
+      <span class="value" id="fv">40 N</span>
+    </div>
+
+    <div class="controls">
+      <label>Khối lượng</label>
+      <input id="mass" type="range" min="5" max="50" step="5" value="20">
+      <span class="value" id="mv">20 kg</span>
+    </div>
+
+    <div class="formula" id="acc">a = 2 m/s²</div>
+    <p id="explain">Giữ nguyên khối lượng, tăng lực thì gia tốc tăng.</p>
+  </div>
+
+  <div class="panel">
+    <h3>Mô hình xe đẩy</h3>
+    <div class="simstage">
+      <div class="ground"></div>
+      <div class="block" id="car"></div>
+      <div class="arrow" id="fa">→</div>
+    </div>
+    <p>Mũi tên chỉ chiều của hợp lực. Khối xe lớn hơn để minh họa khối lượng lớn hơn.</p>
+  </div>
+</section>
+
+<!-- 8. ĐỊNH LUẬT III -->
+<section class="slide">
+  <div>
+    <div class="tag">07 · ĐỊNH LUẬT III NEWTON</div>
+    <h2>Lực và <span class="pink">phản lực</span></h2>
+    <p>Khi vật A tác dụng lên vật B một lực, vật B đồng thời tác dụng lại vật A một lực. Hai lực cùng phương, ngược chiều, cùng độ lớn và đặt vào hai vật khác nhau.</p>
+    <div class="formula">Fₐᵦ = −Fᵦₐ</div>
+    <p>Hai lực không triệt tiêu nhau vì chúng tác dụng lên hai vật khác nhau.</p>
+  </div>
+  <div class="panel">
+    <h3>Cặp lực tương tác</h3>
+    <div style="display:flex;justify-content:space-around;align-items:center;padding:24px 0;font-size:48px">
+      <span>🧑‍🚀</span>
+      <b class="cyan">⇄</b>
+      <span>🛰️</span>
+    </div>
+    <p>Người đẩy thiết bị về một phía; thiết bị đồng thời đẩy người theo phía ngược lại.</p>
+  </div>
+</section>
+
+<!-- 9. TÊN LỬA -->
+<section class="slide">
+  <div>
+    <div class="tag">08 · ỨNG DỤNG</div>
+    <h2>Tên lửa bay lên nhờ đâu?</h2>
+    <p>Động cơ tên lửa phụt khí ra phía sau. Khí tác dụng lực lên tên lửa theo hướng ngược lại, đẩy tên lửa tiến lên.</p>
+    <p>Tên lửa vẫn tạo lực đẩy trong chân không vì nó đẩy khí phụt ra, không cần đẩy vào không khí bên ngoài.</p>
+    <span class="chip">Định luật III Newton</span>
+  </div>
+  <div>
+    <img src="https://images.unsplash.com/photo-1517976487492-5750f3195933?auto=format&fit=crop&w=1100&q=85" alt="Tên lửa phóng lên">
+    <p class="caption">Ảnh tên lửa phóng · Unsplash</p>
+  </div>
+</section>
+
+<!-- 10. ỨNG DỤNG -->
+<section class="slide">
+  <div>
+    <div class="tag">09 · TRONG ĐỜI SỐNG</div>
+    <h2>Vật lí ở ngay quanh ta</h2>
+    <p>Mỗi lần đi xe đạp, đá bóng, bơi hay đẩy xe hàng, ta đều bắt gặp các định luật Newton.</p>
+    <div class="chips">
+      <span class="chip">Xe đạp tăng tốc · Định luật II</span>
+      <span class="chip">Bóng đổi hướng · Định luật I và II</span>
+      <span class="chip">Bơi đẩy nước về sau · Định luật III</span>
+      <span class="chip">Tên lửa phụt khí · Định luật III</span>
+    </div>
+  </div>
+  <div class="panel">
+    <img src="https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?auto=format&fit=crop&w=1000&q=85" alt="Xe đạp">
+    <p>Chuyển động quanh ta có thể được giải thích bằng các định luật Newton.</p>
+  </div>
+</section>
+
+<!-- 11. TRẮC NGHIỆM -->
+<section class="slide">
+  <div>
+    <div class="tag">10 · KIỂM TRA NHANH</div>
+    <h2>Thử sức nhé!</h2>
+    <p id="question">Câu 1 · Khi hợp lực tác dụng lên vật bằng 0…</p>
+    <div class="panel">
+      <div class="quiz" id="answers"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="ghost" id="nextq">Câu tiếp theo →</button>
+    </div>
+  </div>
+  <div class="visual">
+    <div class="big" id="score">0 / 3</div>
+    <div class="orbit"></div>
+  </div>
+</section>
+
+<!-- 12. TỔNG KẾT -->
+<section class="slide">
+  <div>
+    <div class="tag">11 · TỔNG KẾT</div>
+    <h2>Ghi nhớ ba quy luật</h2>
+
+    <div class="panel">
+      <h3 class="cyan">Định luật I · Quán tính</h3>
+      <p>Hợp lực bằng không → vận tốc không đổi.</p>
+    </div>
+
+    <div class="panel">
+      <h3 class="gold">Định luật II · Gia tốc</h3>
+      <p>Hợp lực = khối lượng × gia tốc.</p>
+    </div>
+
+    <div class="panel">
+      <h3 class="pink">Định luật III · Tương tác</h3>
+      <p>Lực và phản lực xuất hiện thành từng cặp.</p>
+    </div>
+  </div>
+
+  <div class="visual">
+    <div class="planet"></div>
+    <div class="orbit"></div>
+  </div>
+</section>
+
+<!-- 13. NGUỒN -->
+<section class="slide">
+  <div>
+    <div class="tag">12 · TƯ LIỆU THAM KHẢO</div>
+    <h2>Học thêm từ nguồn tin cậy</h2>
+    <p>Nội dung được đối chiếu với tài liệu giáo dục của Cơ quan Hàng không và Vũ trụ Hoa Kỳ.</p>
+
+    <div class="links">
+      <a href="https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/newtons-laws-of-motion/" target="_blank">↗ NASA · Ba định luật chuyển động</a>
+      <a href="https://www.nasa.gov/stem-content/newtons-laws-posters-and-activities/" target="_blank">↗ NASA · Áp phích và hoạt động</a>
+      <a href="https://www.nasa.gov/stem-content/stemonstrations-newtons-first-law-of-motion/" target="_blank">↗ NASA · Thí nghiệm định luật I</a>
+      <a href="https://www.nasa.gov/stem-content/the-law-of-action-and-reaction-newtons-third-law/" target="_blank">↗ NASA · Định luật III</a>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Gợi ý thuyết trình nhóm</h3>
+    <p>Phân công mỗi thành viên trình bày một định luật. Dùng mô phỏng để cả lớp dự đoán kết quả trước khi giải thích.</p>
+    <p class="caption">Ảnh lấy từ Wikimedia Commons và Unsplash. Hãy giữ ghi công và kiểm tra điều khoản sử dụng khi tái sử dụng.</p>
+  </div>
+</section>
+
+<!-- KẾT THÚC -->
+<section class="slide center">
+  <div class="tag">KẾT THÚC · VẬT LÍ 10</div>
+  <h1>CẢM ƠN <span class="cyan">THẦY CÔ</span><br>VÀ CÁC BẠN!</h1>
+  <p>Chuyển động không còn là điều bí ẩn khi ta hiểu về lực.</p>
+  <button class="action" id="again">Xem lại từ đầu ↻</button>
+</section>
+
+</main>
+
+<nav class="nav">
+  <button id="prev">← Trước</button>
+  <div class="dots" id="dots"></div>
+  <span class="counter" id="count">01 / 13</span>
+  <button class="next" id="next">Tiếp theo →</button>
+</nav>
+
+<script>
+(() => {
+  const slides = [...document.querySelectorAll('.slide')];
+  const dots = document.getElementById('dots');
+  let n = 0;
+
+  slides.forEach((slide, i) => {
+    const button = document.createElement('button');
+    button.setAttribute('aria-label', 'Đến phần ' + (i + 1));
+    button.onclick = () => show(i);
+    dots.append(button);
+  });
+
+  function show(i) {
+    n = Math.max(0, Math.min(slides.length - 1, i));
+
+    slides.forEach((slide, j) =>
+      slide.classList.toggle('active', j === n)
+    );
+
+    [...dots.children].forEach((button, j) =>
+      button.classList.toggle('on', j === n)
+    );
+
+    document.getElementById('count').textContent =
+      String(n + 1).padStart(2, '0') + ' / ' + slides.length;
+
+    document.getElementById('prev').disabled = n === 0;
+
+    document.getElementById('next').textContent =
+      n === slides.length - 1 ? 'Hoàn tất ✓' : 'Tiếp theo →';
+  }
+
+  document.getElementById('prev').onclick = () => show(n - 1);
+  document.getElementById('next').onclick = () => show(n + 1);
+  document.getElementById('again').onclick = () => show(0);
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') show(n + 1);
+    if (e.key === 'ArrowLeft') show(n - 1);
+  });
+
+  document.getElementById('full').onclick = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      document.documentElement.requestFullscreen?.();
+    }
+  };
+
+  // Mô phỏng định luật I
+  let moved = false;
+
+  document.getElementById('move').onclick = () => {
+    moved = !moved;
+    document.getElementById('inertia').style.left =
+      moved ? '340px' : '35px';
+  };
+
+  document.getElementById('reset').onclick = () => {
+    moved = false;
+    document.getElementById('inertia').style.left = '35px';
+  };
+
+  // Mô phỏng định luật II
+  const force = document.getElementById('force');
+  const mass = document.getElementById('mass');
+
+  function calculate() {
+    const F = Number(force.value);
+    const M = Number(mass.value);
+    const A = F / M;
+
+    document.getElementById('fv').textContent = F + ' N';
+    document.getElementById('mv').textContent = M + ' kg';
+
+    document.getElementById('acc').textContent =
+      'a = ' + A.toLocaleString('vi-VN', {
+        maximumFractionDigits: 2
+      }) + ' m/s²';
+
+    document.getElementById('car').style.width =
+      (48 + M) + 'px';
+
+    document.getElementById('fa').style.transform =
+      'translateX(' + (F * 1.1) + 'px)';
+
+    document.getElementById('explain').textContent =
+      'Với lực ' + F + ' N và khối lượng ' + M +
+      ' kg, gia tốc bằng ' +
+      A.toLocaleString('vi-VN', {
+        maximumFractionDigits: 2
+      }) + ' m/s².';
+  }
+
+  force.oninput = calculate;
+  mass.oninput = calculate;
+  calculate();
+
+  // Trắc nghiệm
+  const questions = [
+    {
+      q: 'Câu 1 · Khi hợp lực tác dụng lên vật bằng 0…',
+      a: [
+        'Vật luôn đứng yên',
+        'Vật giữ nguyên vận tốc',
+        'Vật luôn tăng tốc',
+        'Vật luôn đổi hướng'
+      ],
+      c: 1,
+      w: 'Vật giữ nguyên trạng thái đứng yên hoặc chuyển động thẳng đều.'
+    },
+    {
+      q: 'Câu 2 · Vật 5 kg chịu hợp lực 20 N. Gia tốc bằng bao nhiêu?',
+      a: ['2 m/s²', '4 m/s²', '15 m/s²', '25 m/s²'],
+      c: 1,
+      w: 'a = F/m = 20/5 = 4 m/s².'
+    },
+    {
+      q: 'Câu 3 · Lực và phản lực…',
+      a: [
+        'Cùng chiều',
+        'Khác độ lớn',
+        'Ngược chiều, cùng độ lớn, đặt lên hai vật',
+        'Xuất hiện lần lượt'
+      ],
+      c: 2,
+      w: 'Hai lực tương tác đặt lên hai vật khác nhau.'
+    }
+  ];
+
+  let questionIndex = 0;
+  let score = 0;
+  let answered = false;
+
+  function renderQuestion() {
+    const q = questions[questionIndex];
+
+    document.getElementById('question').textContent = q.q;
+
+    const box = document.getElementById('answers');
+    box.innerHTML = '';
+
+    q.a.forEach((answer, i) => {
+      const button = document.createElement('button');
+      button.textContent =
+        String.fromCharCode(65 + i) + '. ' + answer;
+
+      button.onclick = () => {
+        if (answered) return;
+
+        answered = true;
+
+        if (i === q.c) score++;
+
+        document.getElementById('score').textContent =
+          score + ' / 3';
+
+        document.getElementById('feedback').textContent =
+          (i === q.c ? 'Chính xác! ' : 'Chưa đúng. ') + q.w;
+
+        [...box.children].forEach((item, j) => {
+          item.style.borderColor =
+            j === q.c ? '#7ef0c2' : '#ffffff30';
+        });
+      };
+
+      box.append(button);
+    });
+
+    document.getElementById('feedback').textContent = '';
+    answered = false;
+
+    document.getElementById('nextq').textContent =
+      questionIndex === 2
+        ? 'Làm lại từ đầu ↻'
+        : 'Câu tiếp theo →';
+  }
+
+  document.getElementById('nextq').onclick = () => {
+    questionIndex = (questionIndex + 1) % questions.length;
+
+    if (questionIndex === 0) score = 0;
+
+    document.getElementById('score').textContent =
+      score + ' / 3';
+
+    renderQuestion();
+  };
+
+  renderQuestion();
+  show(0);
+})();
+</script>
+</body>
+</html>
